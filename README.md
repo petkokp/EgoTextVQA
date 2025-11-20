@@ -1,5 +1,11 @@
 # EgoTextVQA
 
+## Test set results
+
+Base SmolVLM2-500M-Video-Instruct - 27/685 correct
+
+Finetuned SmolVLM2-500M-Video-Instruct - 4/685 correct
+
 ---
 
 ## Data preparation

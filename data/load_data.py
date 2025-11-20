@@ -6,10 +6,6 @@ from typing import Tuple
 
 from datasets import load_from_disk, load_dataset, Dataset, DatasetDict, ClassLabel
 
-# Path where you saved the QA dataset built earlier with create_qa_dataset.py
-# (the one that has question, answer, video_id, subset, video_url, etc.)
-QA_DATASET_LOCAL = "egotextvqa_video_qa"  # folder created by qa_ds.save_to_disk(...)
-
 # Metadata-only dataset on Hub (no video column)
 QA_DATASET_META_HF = "petkopetkov/EgoTextVQA"
 
@@ -21,16 +17,12 @@ PROCESSED_VIDEO_ROOT = "./data/egotextvqa_fps6_lowres"
 SPLIT_SAVE_DIR = "egotextvqa_video_qa_splits"
 
 
-def _load_raw_qa_dataset(use_local: bool = True) -> Dataset:
+def _load_raw_qa_dataset() -> Dataset:
     """
     Load the raw QA dataset (no splits), either from a local Arrow folder or from the Hub.
     """
-    if use_local and os.path.exists(QA_DATASET_LOCAL):
-        print(f"[INFO] Loading QA dataset from disk: {QA_DATASET_LOCAL}")
-        ds = load_from_disk(QA_DATASET_LOCAL)
-    else:
-        print(f"[INFO] Loading QA dataset from Hub: {QA_DATASET_META_HF}")
-        ds = load_dataset(QA_DATASET_META_HF, split="train")
+    print(f"[INFO] Loading QA dataset from Hub: {QA_DATASET_META_HF}")
+    ds = load_dataset(QA_DATASET_META_HF, split="train")
     print(ds)
     return ds
 
@@ -106,7 +98,6 @@ def split_by_video_id(
 
 def load_data(
     processed_video_root: str = PROCESSED_VIDEO_ROOT,
-    use_local_dataset: bool = True,
     save_splits: bool = True,
 ) -> Tuple[Dataset, Dataset, Dataset]:
     """
@@ -116,7 +107,7 @@ def load_data(
     Returns:
         train_ds, val_ds, test_ds
     """
-    ds = _load_raw_qa_dataset(use_local=use_local_dataset)
+    ds = _load_raw_qa_dataset()
 
     # Normalize subset to string (handles ClassLabel or already-string)
     subset_feature = ds.features.get("subset", None)
