@@ -4,8 +4,8 @@ from pathlib import Path
 from datasets import load_dataset, Video, ClassLabel
 
 BASE_DATASET = "ShengZhou97/EgoTextVQA"
-INPUT_ROOT = "../data/egotextvqa_fps6_lowres"
-OUTPUT_ROOT = "../data/egotextvqa_fps6_frames"
+INPUT_ROOT = "../data/EgoTextVQA_fps6_lowres"
+OUTPUT_ROOT = "../data/EgoTextVQA_fps6_frames"
 MIN_FRAMES = 1080
 
 def extract_frames(video_path, output_folder, min_frames=1080):

@@ -6,7 +6,7 @@ from data.build_video_index import get_subset_from_label
 
 BASE_DATASET = "ShengZhou97/EgoTextVQA"
 
-OUTPUT_ROOT = "../data/egotextvqa_fps6"
+OUTPUT_ROOT = "../data/EgoTextVQA_fps6"
 
 TARGET_FPS = 6
 

@@ -11,12 +11,12 @@ from build_video_index import build_video_index
 
 BASE_DATASET = "ShengZhou97/EgoTextVQA"
 
-INDOOR_JSONL = "egotextvqa_indoor_annotation.jsonl"
-OUTDOOR_JSONL = "egotextvqa_outdoor_annotation.jsonl"
+INDOOR_JSONL = "EgoTextVQA_indoor_annotation.jsonl"
+OUTDOOR_JSONL = "EgoTextVQA_outdoor_annotation.jsonl"
 
 HF_REPO_ID = "petkopetkov/EgoTextVQA"
 
-LOCAL_SAVE_DIR = "egotextvqa_video_qa"
+LOCAL_SAVE_DIR = "EgoTextVQA_video_qa"
 
 def load_annotations():
     ann_indoor = load_dataset(

@@ -5,8 +5,8 @@ from pathlib import Path
 from datasets import load_dataset, Video, ClassLabel
 
 BASE_DATASET = "ShengZhou97/EgoTextVQA"
-INPUT_ROOT = "../data/egotextvqa_fps6"
-OUTPUT_ROOT = "../data/egotextvqa_fps6_lowres"
+INPUT_ROOT = "../data/EgoTextVQA_fps6"
+OUTPUT_ROOT = "../data/EgoTextVQA_fps6_lowres"
 
 SCALE_FACTOR = 0.5
 

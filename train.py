@@ -8,7 +8,7 @@ from transformers import AutoProcessor, TrainingArguments, Trainer
 
 from data.load_data import load_data
 
-os.environ["WANDB_PROJECT"] = "egotextvqa"
+os.environ["WANDB_PROJECT"] = "EgoTextVQA"
 SEED = 42
 
 

@@ -1,12 +1,44 @@
 # EgoTextVQA
 
-## Test set results
+datasets:
 
-Base SmolVLM2-500M-Video-Instruct - 27/685 correct
+EgoTextVQA
+egotempo google - https://github.com/google-research-datasets/egotempo/blob/main/gemini_eval.ipynb
 
-Finetuned SmolVLM2-500M-Video-Instruct - 4/685 correct
+
+## EgoTextVQA test set results (685 samples)
+
+| Model                                   | Dataset  | Overall Accuracy | Overall Avg. Score |
+|-----------------------------------------|----------|------------------|--------------------|
+| SmolVLM2-500M-Video-Instruct (base)     | Outdoor  | 0.0091           | 0.0457             |
+| SmolVLM2-500M-Video-Instruct (base)     | Indoor   | 0.0040           | 0.0321             |
+| SmolVLM2-500M-Video-Instruct (finetuned)| Outdoor  | 0.0183           | 0.2283             |
+| SmolVLM2-500M-Video-Instruct (finetuned)| Indoor   | 0.0461           | 0.3687             |
+| Qwen3-VL-2B-Instruct                    | Outdoor  | 0.0548           | 0.3744             |
+| Qwen3-VL-2B-Instruct                    | Indoor   | 0.1142           | 0.6673             |
+| Qwen3-VL-4B-Instruct                    | Outdoor  | 0.0137           | 0.1279             |
+| Qwen3-VL-4B-Instruct                    | Indoor   | 0.0000           | 0.0040             |
+
+| Type            | Smol Base Acc | Smol Base Score | Smol FT Acc | Smol FT Score | Qwen2B Acc | Qwen2B Score | Qwen4B Acc | Qwen4B Score |
+|-----------------|---------------|-----------------|-------------|---------------|------------|--------------|------------|--------------|
+| hands-on        | 0.0139        | 0.0694          | 0.0000      | 0.1389        | 0.0556     | 0.3472       | 0.0139     | 0.0694       |
+| kitchen         | 0.0000        | 0.0000          | 0.0606      | 0.4848        | 0.0303     | 0.2121       | 0.0000     | 0.0000       |
+| shopping        | 0.0000        | 0.1667          | 0.0000      | 0.0000        | 0.0000     | 0.0000       | 0.0000     | 0.0000       |
+| gameplay        | 0.0000        | 0.0000          | 0.0541      | 0.5946        | 0.0000     | 0.0541       | 0.0270     | 0.2703       |
+| book-related    | 0.0263        | 0.1053          | 0.0000      | 0.0526        | 0.1579     | 0.9474       | 0.0263     | 0.3421       |
+| others          | 0.0000        | 0.0000          | 0.0000      | 0.0000        | 0.0303     | 0.3636       | 0.0000     | 0.0000       |
+
+| Type                | Smol Base Acc | Smol Base Score | Smol FT Acc | Smol FT Score | Qwen2B Acc | Qwen2B Score | Qwen4B Acc | Qwen4B Score |
+|---------------------|---------------|-----------------|-------------|---------------|------------|--------------|------------|--------------|
+| location            | 0.0078        | 0.0547          | 0.0312      | 0.4219        | 0.1406     | 0.8281       | 0.0000     | 0.0000       |
+| direction           | 0.0000        | 0.0085          | 0.1026      | 0.7009        | 0.1111     | 0.6239       | 0.0000     | 0.0000       |
+| description         | 0.0075        | 0.0448          | 0.0299      | 0.2090        | 0.1343     | 0.7388       | 0.0000     | 0.0000       |
+| intention reasoning | 0.0000        | 0.0230          | 0.0345      | 0.2299        | 0.0805     | 0.4943       | 0.0000     | 0.0230       |
+| others              | 0.0000        | 0.0000          | 0.0000      | 0.0000        | 0.0303     | 0.3636       | 0.0000     | 0.0000       |
 
 ---
+
+The prediction and result files are in the `results` directory (`./results/<model_name>_predictions.json` and `./results/<model_name>_results.json`).  
 
 ## Data preparation
 
@@ -44,7 +76,7 @@ python change_video_fps.py
 Outputs:
 
 ```text
-./data/egotextvqa_fps6/
+./data/EgoTextVQA_fps6/
   EgoTextVQA-Indoor/<video_id>.mp4
   EgoTextVQA-Outdoor/<video_id>.mp4
 ```
@@ -59,7 +91,7 @@ python change_video_resolution.py
 Outputs:
 
 ```text
-./data/egotextvqa_fps6_lowres/
+./data/EgoTextVQA_fps6_lowres/
   EgoTextVQA-Indoor/<video_id>.mp4
   EgoTextVQA-Outdoor/<video_id>.mp4
 ```
@@ -72,10 +104,32 @@ Here’s a compact, README-friendly description of your **training script**.
 
 The training script supports finetuning the [SmolVLM2-500M-Video-Instruct model](https://huggingface.co/HuggingFaceTB/SmolVLM2-500M-Video-Instruct) on the EgoTextVQA dataset using **video + question → answer** supervision.
 
-It assumes that the data was preprocessed locally (FPS and resolution were reduced) and tries to read it from `./data/egotextvqa_fps6_lowres`
+It assumes that the data was preprocessed locally (FPS and resolution were reduced) and tries to read it from `./data/EgoTextVQA_fps6_lowres`
 
 ```bash
 python train.py
 ```
 
 By default, the checkpoints are saved to `./checkpoints/SmolVLM2-500M-Video-Instruct`
+
+## Evaluation
+
+A model can be evaluated on the test set () that was generated during the data preparation process. First, model predictions are generated using:
+
+```
+python predict.py
+```
+
+`model_name` can be adjusted to the path of the model that is being evaluated. The results are saved to `<model_name>_predictions.json`
+
+After the predictions are generated, a LLM-as-a-judge (by default `gemini-2.5-flash` but can easily be adapted) is used to get the final accuracy (the `GEMINI_API_KEY` environment variable has to be set):
+
+```
+python eval.py
+```
+
+By default the input (`--pred_path`) is `<model_name>_predictions.json` (from the previous step) and the results are saved to `results.json` (`--output_json`).
+
+---
+
+A part of the code is based on `https://github.com/zhousheng97/EgoTextVQA`.
