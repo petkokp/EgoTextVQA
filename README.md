@@ -1,10 +1,6 @@
 # EgoTextVQA
 
-datasets:
-
-EgoTextVQA
-egotempo google - https://github.com/google-research-datasets/egotempo/blob/main/gemini_eval.ipynb
-
+https://github.com/user-attachments/assets/e85f740b-0538-4822-b307-634b9ad1d838
 
 ## EgoTextVQA test set results (685 samples)
 
