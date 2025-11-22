@@ -1,40 +1,50 @@
 # EgoTextVQA
 
-datasets:
-
-EgoTextVQA
-egotempo google - https://github.com/google-research-datasets/egotempo/blob/main/gemini_eval.ipynb
-
+[<video controls src="https://github.com/user-attachments/assets/e85f740b-0538-4822-b307-634b9ad1d838" title="Title"></video>](https://github.com/user-attachments/assets/e85f740b-0538-4822-b307-634b9ad1d838)
 
 ## EgoTextVQA test set results (685 samples)
 
-| Model                                   | Dataset  | Overall Accuracy | Overall Avg. Score |
-|-----------------------------------------|----------|------------------|--------------------|
-| SmolVLM2-500M-Video-Instruct (base)     | Outdoor  | 0.0091           | 0.0457             |
-| SmolVLM2-500M-Video-Instruct (base)     | Indoor   | 0.0040           | 0.0321             |
-| SmolVLM2-500M-Video-Instruct (finetuned)| Outdoor  | 0.0183           | 0.2283             |
-| SmolVLM2-500M-Video-Instruct (finetuned)| Indoor   | 0.0461           | 0.3687             |
-| Qwen3-VL-2B-Instruct                    | Outdoor  | 0.0548           | 0.3744             |
-| Qwen3-VL-2B-Instruct                    | Indoor   | 0.1142           | 0.6673             |
-| Qwen3-VL-4B-Instruct                    | Outdoor  | 0.0137           | 0.1279             |
-| Qwen3-VL-4B-Instruct                    | Indoor   | 0.0000           | 0.0040             |
+### Overall results (indoor & outdoor)
 
-| Type            | Smol Base Acc | Smol Base Score | Smol FT Acc | Smol FT Score | Qwen2B Acc | Qwen2B Score | Qwen4B Acc | Qwen4B Score |
-|-----------------|---------------|-----------------|-------------|---------------|------------|--------------|------------|--------------|
-| hands-on        | 0.0139        | 0.0694          | 0.0000      | 0.1389        | 0.0556     | 0.3472       | 0.0139     | 0.0694       |
-| kitchen         | 0.0000        | 0.0000          | 0.0606      | 0.4848        | 0.0303     | 0.2121       | 0.0000     | 0.0000       |
-| shopping        | 0.0000        | 0.1667          | 0.0000      | 0.0000        | 0.0000     | 0.0000       | 0.0000     | 0.0000       |
-| gameplay        | 0.0000        | 0.0000          | 0.0541      | 0.5946        | 0.0000     | 0.0541       | 0.0270     | 0.2703       |
-| book-related    | 0.0263        | 0.1053          | 0.0000      | 0.0526        | 0.1579     | 0.9474       | 0.0263     | 0.3421       |
-| others          | 0.0000        | 0.0000          | 0.0000      | 0.0000        | 0.0303     | 0.3636       | 0.0000     | 0.0000       |
+| Model                                    | Dataset | Overall Accuracy | Overall Avg. Score |
+| ---------------------------------------- | ------- | ---------------- | ------------------ |
+| SmolVLM2-500M-Video-Instruct (base)      | Outdoor | 0.0091           | 0.0457             |
+| SmolVLM2-500M-Video-Instruct (base)      | Indoor  | 0.0040           | 0.0321             |
+| SmolVLM2-500M-Video-Instruct (finetuned) | Outdoor | 0.0183           | 0.2283             |
+| SmolVLM2-500M-Video-Instruct (finetuned) | Indoor  | 0.0461           | 0.3687             |
+| Qwen3-VL-2B-Instruct                     | Outdoor | **0.0548**       | **0.3744**         |
+| Qwen3-VL-2B-Instruct                     | Indoor  | **0.1142**       | **0.6673**         |
+| Qwen3-VL-4B-Instruct                     | Outdoor | 0.0137           | 0.1279             |
+| Qwen3-VL-4B-Instruct                     | Indoor  | 0.0000           | 0.0040             |
+| Qwen3-VL-2B-Thinking                     | Outdoor | 0.0411           | 0.2557             |
+| Qwen3-VL-2B-Thinking                     | Indoor  | **0.1142**       | 0.6132             |
 
-| Type                | Smol Base Acc | Smol Base Score | Smol FT Acc | Smol FT Score | Qwen2B Acc | Qwen2B Score | Qwen4B Acc | Qwen4B Score |
-|---------------------|---------------|-----------------|-------------|---------------|------------|--------------|------------|--------------|
-| location            | 0.0078        | 0.0547          | 0.0312      | 0.4219        | 0.1406     | 0.8281       | 0.0000     | 0.0000       |
-| direction           | 0.0000        | 0.0085          | 0.1026      | 0.7009        | 0.1111     | 0.6239       | 0.0000     | 0.0000       |
-| description         | 0.0075        | 0.0448          | 0.0299      | 0.2090        | 0.1343     | 0.7388       | 0.0000     | 0.0000       |
-| intention reasoning | 0.0000        | 0.0230          | 0.0345      | 0.2299        | 0.0805     | 0.4943       | 0.0000     | 0.0230       |
-| others              | 0.0000        | 0.0000          | 0.0000      | 0.0000        | 0.0303     | 0.3636       | 0.0000     | 0.0000       |
+### Outdoor per-type results
+
+| Type         | Smol Base Acc | Smol Base Score | Smol FT Acc | Smol FT Score | Qwen2B Acc | Qwen2B Score | Qwen4B Acc | Qwen4B Score | Qwen2B-Thinking Acc | Qwen2B-Thinking Score |
+| ------------ | ------------- | --------------- | ----------- | ------------- | ---------- | ------------ | ---------- | ------------ | ------------------- | --------------------- |
+| hands-on     | 0.0139        | 0.0694          | 0.0000      | 0.1389        | **0.0556** | **0.3472**   | 0.0139     | 0.0694       | 0.0278              | 0.1944                |
+| kitchen      | 0.0000        | 0.0000          | **0.0606**  | **0.4848**    | 0.0303     | 0.2121       | 0.0000     | 0.0000       | 0.0303              | 0.2424                |
+| shopping     | 0.0000        | **0.1667**      | 0.0000      | 0.0000        | 0.0000     | 0.0000       | 0.0000     | 0.0000       | 0.0000              | 0.0000                |
+| gameplay     | 0.0000        | 0.0000          | **0.0541**  | **0.5946**    | 0.0000     | 0.0541       | 0.0270     | 0.2703       | 0.0000              | 0.0541                |
+| book-related | 0.0263        | 0.1053          | 0.0000      | 0.0526        | **0.1579** | **0.9474**   | 0.0263     | 0.3421       | **0.1579**          | 0.8158                |
+| others       | 0.0000        | 0.0000          | 0.0000      | 0.0000        | **0.0303** | **0.3636**   | 0.0000     | 0.0000       | 0.0000              | 0.0303                |
+
+### Indoor per-type results
+
+| Type                | Smol Base Acc | Smol Base Score | Smol FT Acc | Smol FT Score | Qwen2B Acc | Qwen2B Score | Qwen4B Acc | Qwen4B Score | Qwen2B-Thinking Acc | Qwen2B-Thinking Score |
+| ------------------- | ------------- | --------------- | ----------- | ------------- | ---------- | ------------ | ---------- | ------------ | ------------------- | --------------------- |
+| location            | 0.0078        | 0.0547          | 0.0312      | 0.4219        | **0.1406** | **0.8281**   | 0.0000     | 0.0000       | 0.1250              | 0.6641                |
+| direction           | 0.0000        | 0.0085          | 0.1026      | 0.7009        | 0.1111     | 0.6239       | 0.0000     | 0.0000       | **0.1624**          | **0.8632**            |
+| description         | 0.0075        | 0.0448          | 0.0299      | 0.2090        | **0.1343** | **0.7388**   | 0.0000     | 0.0000       | 0.1045              | 0.5970                |
+| intention reasoning | 0.0000        | 0.0230          | 0.0345      | 0.2299        | 0.0805     | **0.4943**   | 0.0000     | 0.0230       | **0.0920**          | 0.4483                |
+| others              | 0.0000        | 0.0000          | 0.0000      | 0.0000        | **0.0303** | **0.3636**   | 0.0000     | 0.0000       | 0.0000              | 0.0303                |
+
+* **Smol Base** = SmolVLM2-500M-Video-Instruct (base)
+* **Smol FT** = Finetuned SmolVLM2-500M-Video-Instruct
+* **Qwen2B** = Qwen3-VL-2B-Instruct
+* **Qwen4B** = Qwen3-VL-4B-Instruct
+* **Qwen2B-Thinking** = Qwen3-VL-2B-Thinking
 
 ---
 
@@ -133,3 +143,13 @@ By default the input (`--pred_path`) is `<model_name>_predictions.json` (from th
 ---
 
 A part of the code is based on `https://github.com/zhousheng97/EgoTextVQA`.
+
+## Dataset visualization and error analysis
+
+The `app.py` Streamlit app allows to visualize the dataset and analyze the errors from the model's predictions. It can be launched like this:
+
+```
+streamlit run app.py
+```
+
+A predictions JSON file (like the one from the `results` directory) can be uploaded through the `1. Load Predictions` option in the sidebar control panel. Also the current video sample can be changed through the `2. Select Sample` option.
