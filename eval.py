@@ -130,10 +130,6 @@ def print_score(model):
         sample['acc'] = score_dict.get('pred', 'no')
         sample['score'] = score_dict.get('score', 0)
 
-        if not existing_data:
-            content = {}
-            existing_data.append(content)
-
         update_json_file(args.output_json, existing_data, sample)
 
     print("All evaluation completed!")

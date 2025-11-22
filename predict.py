@@ -9,7 +9,7 @@ from data.load_data import load_splits
 
 EVAL_MODEL = "gemini-2.5-flash"
 
-model_name = "unsloth/Qwen3-VL-2B-Instruct"
+model_name = "unsloth/Qwen3-VL-4B-Thinking"
 model, tokenizer = FastVisionModel.from_pretrained(
     model_name,
     full_finetuning=True,
@@ -22,6 +22,10 @@ os.makedirs("temp", exist_ok=True)
 splits = load_splits()
 data = splits["test"]
 print(f"[INFO] Loaded test split with {len(data)} examples")
+
+MAX_NEW_TOKENS = 2048 if "Thinking" in model_name else 1024
+
+print(f"Using {MAX_NEW_TOKENS} max_new_tokens")
 
 predictions = []
 for sample in tqdm(data):
@@ -61,8 +65,9 @@ for sample in tqdm(data):
             return_tensors="pt"
         )
         inputs = {k: v.to(model.device) for k, v in inputs.items()}
+        
         with torch.no_grad():
-            generated_ids = model.generate(**inputs, max_new_tokens=1024)
+            generated_ids = model.generate(**inputs, max_new_tokens=MAX_NEW_TOKENS)
         generated_ids_trimmed = generated_ids[0][len(inputs["input_ids"][0]) :]
         pred_answer = processor.decode(generated_ids_trimmed, skip_special_tokens=True)
 
@@ -81,5 +86,5 @@ for sample in tqdm(data):
         print(f"Error processing {sample['question_id']}: {e}")
         continue
 
-with open(f"{model_name}_predictions.json", "w") as f:
+with open(f"{model_name.split('/')[1]}_predictions.json", "w") as f:
     json.dump(predictions, f, indent=4)
