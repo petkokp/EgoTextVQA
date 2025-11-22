@@ -1,6 +1,6 @@
 # EgoTextVQA
 
-[<video controls src="https://github.com/user-attachments/assets/e85f740b-0538-4822-b307-634b9ad1d838" title="Title"></video>](https://github.com/user-attachments/assets/e85f740b-0538-4822-b307-634b9ad1d838)
+https://github.com/user-attachments/assets/e85f740b-0538-4822-b307-634b9ad1d838
 
 ## EgoTextVQA test set results (685 samples)
 
@@ -143,6 +143,7 @@ By default the input (`--pred_path`) is `<model_name>_predictions.json` (from th
 ---
 
 A part of the code is based on `https://github.com/zhousheng97/EgoTextVQA`.
+<<<<<<< HEAD
 
 ## Dataset visualization and error analysis
 
@@ -153,3 +154,5 @@ streamlit run app.py
 ```
 
 A predictions JSON file (like the one from the `results` directory) can be uploaded through the `1. Load Predictions` option in the sidebar control panel. Also the current video sample can be changed through the `2. Select Sample` option.
+=======
+>>>>>>> 5fdd4411f2c3c0a228ab5124663ec82903f3eebe
