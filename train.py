@@ -1,11 +1,10 @@
 from unsloth import FastVisionModel
 import math
 import os
-
 import torch
 from torch.nn.utils.rnn import pad_sequence
 from transformers import AutoProcessor, TrainingArguments, Trainer
-
+from qwen_vl_utils import process_vision_info
 from data.load_data import load_data
 
 os.environ["WANDB_PROJECT"] = "EgoTextVQA"
@@ -40,13 +39,18 @@ def dynamic_steps(
         "warmup_steps": warmup_steps,
     }
 
-model_id = "HuggingFaceTB/SmolVLM2-500M-Video-Instruct"
+model_id = "unsloth/Qwen3-VL-2B-Instruct" # "HuggingFaceTB/SmolVLM2-500M-Video-Instruct"
 
-processor = AutoProcessor.from_pretrained(model_id)
+IS_QWEN_MODEL = "Qwen" in model_id
+
+processor = AutoProcessor.from_pretrained(
+    model_id,
+)
 
 model, tokenizer = FastVisionModel.from_pretrained(
     model_id,
     full_finetuning=True,
+    use_gradient_checkpointing="unsloth",
 )
 
 peak_mem = torch.cuda.max_memory_allocated()
@@ -55,17 +59,66 @@ print(f"[INFO] The model as is is holding: {peak_mem / 1024**3:.2f} GB of GPU RA
 train_ds, val_ds, test_ds = load_data()
 print(f"[INFO] Train / Val / Test sizes: {len(train_ds)} / {len(val_ds)} / {len(test_ds)}")
 
-image_token_id = processor.tokenizer.additional_special_tokens_ids[
-    processor.tokenizer.additional_special_tokens.index("<image>")
-]
+if not IS_QWEN_MODEL:
+    image_token_id = processor.tokenizer.additional_special_tokens_ids[
+        processor.tokenizer.additional_special_tokens.index("<image>")
+    ]
 
-def collate_fn(examples):
+def qwen_collate_fn(examples):
+    texts = []
+    video_inputs = []
+    
+    for example in examples:
+        video_path = example["local_video_path"]
+        
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "video", "video": video_path},
+                    {"type": "text", "text": example["question"]},
+                ],
+            },
+            {
+                "role": "assistant",
+                "content": [{"type": "text", "text": example["answer"]}],
+            }
+        ]
+        
+        text = processor.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=False
+        )
+        
+        image_input, video_input = process_vision_info(messages)
+        
+        texts.append(text)
+        video_inputs.append(video_input[0] if video_input else None)
+
+    batch = processor(
+        text=texts,
+        videos=video_inputs,
+        padding=True,
+        return_tensors="pt",
+    )
+
+    labels = batch["input_ids"].clone()
+    
+    labels[labels == processor.tokenizer.pad_token_id] = -100
+    
+    if "video_token_id" in processor.tokenizer.get_vocab():
+        video_token_id = processor.tokenizer.convert_tokens_to_ids("<|video_pad|>")
+        labels[labels == video_token_id] = -100
+
+    batch["labels"] = labels
+    return batch
+
+def smolvlm_collate_fn(examples):
     instances = []
     for example in examples:
         video_path = example["local_video_path"]
 
         user_content = [{"type": "text", "text": example["question"]}]
-        user_content.append({"type": "video", "path": video_path})
+        user_content.append({"type": "video", "path": video_path, "fps": 1.0})
 
         messages = [
             {"role": "user", "content": user_content},
@@ -152,8 +205,8 @@ model_name = model_id.split("/")[-1]
 
 FastVisionModel.for_training(model, use_gradient_checkpointing=False)
 
-batch_size = 2
-gradient_accumulation_steps = 8
+batch_size = 1
+gradient_accumulation_steps = 16
 num_train_epochs = 1
 
 config = dynamic_steps(
@@ -168,7 +221,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=batch_size,
     per_device_eval_batch_size=batch_size,
     gradient_accumulation_steps=gradient_accumulation_steps,
-    learning_rate=1e-4,
+    learning_rate=2e-4 if IS_QWEN_MODEL else 1e-4
     weight_decay=0.01,
     logging_strategy="steps",
     eval_strategy="steps",
@@ -184,12 +237,13 @@ training_args = TrainingArguments(
     remove_unused_columns=False,
     report_to="wandb",
     dataloader_pin_memory=False,
+    optim="paged_adamw_32bit" if IS_QWEN_MODEL else "adamw_torch"
 )
 
 trainer = Trainer(
     model=model,
     args=training_args,
-    data_collator=collate_fn,
+    data_collator=qwen_collate_fn if IS_QWEN_MODEL else smolvlm_collate_fn,
     train_dataset=train_ds,
     eval_dataset=val_ds,
 )
