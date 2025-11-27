@@ -2,6 +2,25 @@
 
 https://github.com/user-attachments/assets/e85f740b-0538-4822-b307-634b9ad1d838
 
+## EgoTempo results (496 samples)
+
+**Models fine-tuned on EgoTextVQA and evaluated on EgoTempo**
+
+| Type                     | Smol-FT Acc | Smol-FT Score | Qwen2B-FT Acc | Qwen2B-FT Score |
+|--------------------------|-------------|---------------|---------------|------------------|
+| action sequence          | 0.0000      | **0.4792**    | 0.0000        | 0.3125           |
+| action-specific object   | **0.0400**  | **0.5400**    | 0.0200        | 0.4000           |
+| counting actions         | **0.2653**  | **1.5102**    | **0.2653**    | 1.4694           |
+| counting objects         | **0.3000**  | **1.5600**    | 0.2000        | 1.1000           |
+| future action prediction | **0.0600**  | **0.7000**    | **0.0600**    | 0.5400           |
+| locating object          | **0.0200**  | **0.6400**    | **0.0200**    | 0.4000           |
+| object sequence          | 0.0200      | 0.4400        | **0.0600**    | **0.4600**       |
+| object-specific action   | 0.0000      | **0.7400**    | **0.0200**    | 0.5600           |
+| spatial relationship     | 0.1400      | 1.2200        | **0.2600**    | **1.8200**       |
+| temporal event ordering  | 0.0408      | 0.2857        | **0.0816**    | **0.4898**       |
+| **Overall**              | 0.0887      | **0.8125**    | **0.0988**    | 0.7560           |
+
+
 ## EgoTextVQA test set results (685 samples)
 
 ### Overall results (indoor & outdoor)
@@ -114,12 +133,26 @@ Here’s a compact, README-friendly description of your **training script**.
 
 ## Training
 
-The training script supports finetuning the [SmolVLM2-500M-Video-Instruct model](https://huggingface.co/HuggingFaceTB/SmolVLM2-500M-Video-Instruct) on the EgoTextVQA dataset using **video + question → answer** supervision.
+The training script supports finetuning of the [Qwen3-VL-2B-Instruct model](unsloth/Qwen3-VL-2B-Instruct) and the [SmolVLM2-500M-Video-Instruct model](https://huggingface.co/HuggingFaceTB/SmolVLM2-500M-Video-Instruct) on the EgoTextVQA dataset using **video + question → answer** supervision.
 
 It assumes that the data was preprocessed locally (FPS and resolution were reduced) and tries to read it from `./data/EgoTextVQA_fps6_lowres`
 
+Train only on EgoTempo, validate on EgoTempo:
+
 ```bash
-python train.py
+python train.py --train-datasets egotempo --val-datasets egotempo --egotempo-root ./data/trimmed_clips --egotempo-json ./data/egotempo_openQA.json --model-id unsloth/Qwen3-VL-2B-Instruct
+```
+
+Train on EgoTextVQA, validate on EgoTempo:
+
+```bash
+python train.py --train-datasets egotextvqa --val-datasets egotempo
+```
+
+Mixed training (70/30) with shared val/test:
+
+```bash
+python train.py --train-datasets egotextvqa egotempo --train-weights 0.7 0.3 --val-datasets egotextvqa egotempo --val-weights 0.5 0.5
 ```
 
 By default, the checkpoints are saved to `./checkpoints/SmolVLM2-500M-Video-Instruct`
@@ -145,7 +178,6 @@ By default the input (`--pred_path`) is `<model_name>_predictions.json` (from th
 ---
 
 A part of the code is based on `https://github.com/zhousheng97/EgoTextVQA`.
-<<<<<<< HEAD
 
 ## Dataset visualization and error analysis
 
@@ -156,5 +188,3 @@ streamlit run app.py
 ```
 
 A predictions JSON file (like the one from the `results` directory) can be uploaded through the `1. Load Predictions` option in the sidebar control panel. Also the current video sample can be changed through the `2. Select Sample` option.
-=======
->>>>>>> 5fdd4411f2c3c0a228ab5124663ec82903f3eebe
