@@ -6,19 +6,21 @@ https://github.com/user-attachments/assets/e85f740b-0538-4822-b307-634b9ad1d838
 
 **Models fine-tuned on EgoTextVQA and evaluated on EgoTempo**
 
-| Type                     | Smol-FT Acc | Smol-FT Score | Qwen2B-FT Acc | Qwen2B-FT Score |
-|--------------------------|-------------|---------------|---------------|------------------|
-| action sequence          | 0.0000      | **0.4792**    | 0.0000        | 0.3125           |
-| action-specific object   | **0.0400**  | **0.5400**    | 0.0200        | 0.4000           |
-| counting actions         | **0.2653**  | **1.5102**    | **0.2653**    | 1.4694           |
-| counting objects         | **0.3000**  | **1.5600**    | 0.2000        | 1.1000           |
-| future action prediction | **0.0600**  | **0.7000**    | **0.0600**    | 0.5400           |
-| locating object          | **0.0200**  | **0.6400**    | **0.0200**    | 0.4000           |
-| object sequence          | 0.0200      | 0.4400        | **0.0600**    | **0.4600**       |
-| object-specific action   | 0.0000      | **0.7400**    | **0.0200**    | 0.5600           |
-| spatial relationship     | 0.1400      | 1.2200        | **0.2600**    | **1.8200**       |
-| temporal event ordering  | 0.0408      | 0.2857        | **0.0816**    | **0.4898**       |
-| **Overall**              | 0.0887      | **0.8125**    | **0.0988**    | 0.7560           |
+| Type                     | Smol-Base Acc | Smol-Base Score | Smol-FT Acc | Smol-FT Score | Qwen2B Acc (base) | Qwen2B Score (base) | Qwen2B-FT Acc | Qwen2B-FT Score |
+|--------------------------|---------------|------------------|-------------|---------------|-------------------|---------------------|---------------|------------------|
+| action sequence          | 0.0208        | 0.5833           | 0.0000      | 0.4792        | **0.1042**        | **1.6458**          | 0.0000        | 0.3125           |
+| action-specific object   | 0.1200        | 1.0800           | 0.0400      | 0.5400        | **0.3200**        | **2.1400**          | 0.0200        | 0.4000           |
+| counting actions         | 0.1633        | 1.2653           | **0.2653**  | **1.5102**    | **0.2653**        | 1.4898              | **0.2653**    | 1.4694           |
+| counting objects         | 0.3600        | 2.0200           | 0.3000      | 1.5600        | **0.4200**        | **2.2200**          | 0.2000        | 1.1000           |
+| future action prediction | 0.1600        | 1.2200           | 0.0600      | 0.7000        | **0.2600**        | **1.6600**          | 0.0600        | 0.5400           |
+| locating object          | 0.1200        | 1.2200           | 0.0200      | 0.6400        | **0.3000**        | **2.0600**          | 0.0200        | 0.4000           |
+| object sequence          | 0.0600        | 0.7400           | 0.0200      | 0.4400        | **0.1400**        | **1.4800**          | 0.0600        | 0.4600           |
+| object-specific action   | 0.0200        | 0.7200           | 0.0000      | 0.7400        | **0.1600**        | **1.7000**          | 0.0200        | 0.5600           |
+| spatial relationship     | 0.1000        | 1.3400           | 0.1400      | 1.2200        | **0.2800**        | **1.9000**          | 0.2600        | 1.8200           |
+| temporal event ordering  | 0.0408        | 0.4082           | 0.0408      | 0.2857        | **0.2653**        | **1.5714**          | 0.0816        | 0.4898           |
+| **Overall**              | 0.1169        | 1.0625           | 0.0887      | 0.8125        | **0.2520**        | **1.7883**          | 0.0988        | 0.7560           |
+
+
 
 
 ## EgoTextVQA test set results (685 samples)
@@ -69,7 +71,11 @@ https://github.com/user-attachments/assets/e85f740b-0538-4822-b307-634b9ad1d838
 
 ---
 
-The prediction and result files are in the `results` directory (`./results/<model_name>_predictions.json` and `./results/<model_name>_results.json`).  
+The prediction and result files are in the `results` directory (`./results/<model_name>_predictions.json` and `./results/<model_name>_results.json`).
+
+The models fine-tuned on the EgoTextVQA dataset are available on HuggingFace:
+https://huggingface.co/petkopetkov/SmolVLM2-500M-Video-Instruct-EgoTextVQA
+https://huggingface.co/petkopetkov/Qwen3-VL-2B-Instruct-EgoTextVQA
 
 ## Data preparation
 
@@ -155,14 +161,14 @@ Mixed training (70/30) with shared val/test:
 python train.py --train-datasets egotextvqa egotempo --train-weights 0.7 0.3 --val-datasets egotextvqa egotempo --val-weights 0.5 0.5
 ```
 
-By default, the checkpoints are saved to `./checkpoints/SmolVLM2-500M-Video-Instruct`
+By default, the checkpoints are saved to `./checkpoints/<model_name>`
 
 ## Evaluation
 
-A model can be evaluated on the test set () that was generated during the data preparation process. First, model predictions are generated using:
+A model can be evaluated on the EgoTextVQA test set that was generated during the data preparation process or on the EgoTempo dataset. First, model predictions are generated using:
 
 ```
-python predict.py
+python predict.py --datasets egotempo --model-id unsloth/Qwen3-VL-2B-Instruct --pred-key gemini-2.5-flash
 ```
 
 `model_name` can be adjusted to the path of the model that is being evaluated. The results are saved to `<model_name>_predictions.json`
@@ -170,7 +176,7 @@ python predict.py
 After the predictions are generated, a LLM-as-a-judge (by default `gemini-2.5-flash` but can easily be adapted) is used to get the final accuracy (the `GEMINI_API_KEY` environment variable has to be set):
 
 ```
-python eval.py
+python eval.py --pred_path results/<file>.json --model-key gemini-2.5-flash --judge-model gemini-2.5-flash --datasets egotempo
 ```
 
 By default the input (`--pred_path`) is `<model_name>_predictions.json` (from the previous step) and the results are saved to `results.json` (`--output_json`).
